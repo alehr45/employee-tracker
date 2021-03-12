@@ -8,7 +8,7 @@ CREATE TABLE department (
   name VARCHAR(30)
  
 );
--- DEPARTMENT TABLE ----
+
 CREATE TABLE role (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(30),
@@ -16,7 +16,7 @@ CREATE TABLE role (
   department_id INT,
   FOREIGN KEY (department_id) REFERENCES department(id)
 );
--- EMPLOYEE ROLE TABLE ----
+
 CREATE TABLE employee (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   first_name VARCHAR(30),
@@ -28,29 +28,29 @@ CREATE TABLE employee (
 
 );
 
-USE employees;
-
 INSERT INTO department (name)
-VALUE ("Engineering");
-INSERT INTO department (name)
-VALUE ("Finance");
-INSERT INTO department (name)
-VALUE ("Legal");
-INSERT INTO department (name)
-VALUE ("Sales");
-
+VALUES 
+("Engineering"),
+("Finance"),
+("Legal"),
+("Sales");
 
 INSERT INTO role (title, salary, department_id)
-VALUE ("Sales Lead", "100000", 1);
-INSERT INTO role (title, salary, department_id)
-VALUE ("Salesperson", "65000", 1);
-INSERT INTO role (title, salary, department_id)
-VALUE ("Lead Engineer", "95000", 2);
-INSERT INTO role (title, salary, department_id)
-VALUE ("Software Engineer", "75000", 2);
-INSERT INTO role (title, salary, department_id)
-VALUE ("Account Manager", "85000", 3);
-INSERT INTO role (title, salary, department_id)
-VALUE ("Accountant", "75000", 3);
-INSERT INTO role (title, salary, department_id)
-VALUE ("Legal Team Lead", "115000", 4);
+VALUES 
+("Sales Lead", "100000", 1),
+("Salesperson", "65000", 1),
+("Lead Engineer", "95000", 2),
+("Software Engineer", "75000", 2),
+("Account Manager", "85000", 3),
+("Accountant", "75000", 3),
+("Legal Team Lead", "115000", 4);
+
+INSERT INTO employee (first_name, last_name, manager_id, role_id)
+VALUES 
+("Amanda", "Fulton", null, 1),
+("Stephanie", "Dickerson", null, 2),
+("Derrick", "Smith", null, 3),
+("Bently", "Callahan", 1, 4),
+("Chris", "Jackson", 4, 5),
+("Lindsay", "Holt", 1, 6),
+("Jim", "Fairfield", 2, 7);
