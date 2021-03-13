@@ -3,7 +3,6 @@ const inquirer = require("inquirer");
 const mysql = require("mysql2");
 const table = require("console.table");
 
-
 const connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
@@ -15,7 +14,6 @@ const connection = mysql.createConnection({
 connection.connect(function (err) {
   if (err) throw err;
   promptUser();
-  
 });
 
 function promptUser() {
@@ -60,6 +58,18 @@ function promptUser() {
       }
     });
 }
+const managerArray = [];
+function selectManager() {
+  connection.query("SELECT first_name, last_name FROM employee WHERE manager_id IS NULL", 
+  function(err, res) {
+  if (err) throw err
+    for (var i = 0; i < res.length; i++) {
+    managerArray.push(res[i].first_name, last_name);
+    }
+
+  })
+  return managesArray;
+}
 
 function viewAllEmployees() {
   connection.query(
@@ -81,11 +91,11 @@ function viewAllRoles() {
       promptUser();
     }
   );
-};
+}
 
 function viewAllDepartments() {
-  connection.query(
-    "SELECT name FROM department;", function (err, res) {
+  connection.query("SELECT name FROM department;", 
+  function (err, res) {
     if (err) throw err;
     console.table(res);
     promptUser();
@@ -96,8 +106,13 @@ function addEmployee() {
   inquirer.prompt([
     {
       type: "input",
-      message: "What is the Employee's name?",
-      name: "name",
+      message: "What is the Employee's first name?",
+      name: "first",
+    },
+    {
+      type: "input",
+      message: "What is the Employee's last name?",
+      name: "last",
     },
     {
       type: "input",
@@ -105,7 +120,12 @@ function addEmployee() {
       name: "role",
     },
   ]);
-}
+  connection.query("INSERT INTO employees first_name, last_name, role.id;", 
+  function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    promptUser();
+})};
 
 function addRole() {
   inquirer.prompt([
