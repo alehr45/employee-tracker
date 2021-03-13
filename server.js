@@ -24,33 +24,33 @@ function promptUser() {
         message: "What would you like to do?",
         name: "choice",
         choices: [
+          "View Departments",
+          "View All Roles",
           "View All Employees",
-          "View All Employees By Roles",
-          "View All Employees By Department",
-          "Update Employee",
-          "Add Employee",
-          "Add Role",
           "Add Department",
+          "Add Role",
+          "Add Employee",
+          "Update Employee Role",
           "Exit",
         ],
       },
     ])
     .then(function (val) {
       switch (val.choice) {
+        case "View Departments":
+          viewAllDepartments();
+          break;
+        case "View All Roles":
+          viewAllRoles();
+          break;
         case "View All Employees":
           viewAllEmployees();
           break;
-        case "View All Employees By Roles":
-          viewAllRoles();
-          break;
-        case "View All Employees By Department":
-          viewAllDepartments();
+        case "Add Role":
+          addRole();
           break;
         case "Add Employee":
           addEmployee();
-          break;
-        case "Add Role":
-          addRolePrompt();
           break;
         case "Exit":
           connection.end();
@@ -58,31 +58,64 @@ function promptUser() {
       }
     });
 }
-
 const managerArray = [];
 function selectManager() {
-  connection.query("SELECT first_name, last_name FROM employee WHERE manager_id IS NULL", 
-  function(err, res) {
-  if (err) throw err
-    for (var i = 0; i < res.length; i++) {
-    managerArray.push(res[i].first_name);
+  connection.query(
+    "SELECT first_name, last_name FROM employee WHERE manager_id IS NULL",
+    function (err, res) {
+      if (err) throw err;
+      for (var i = 0; i < res.length; i++) {
+        managerArray.push(res[i].first_name);
+      }
     }
-
-  })
+  );
   return managerArray;
 }
 
 const roleArray = [];
 function selectRole() {
-  connection.query("SELECT * FROM role", 
-  function(err, res) {
-  if (err) throw err
+  connection.query("SELECT * FROM role", function (err, res) {
+    if (err) throw err;
     for (var i = 0; i < res.length; i++) {
-    roleArray.push(res[i].title);
+      roleArray.push(res[i].title);
     }
-
-  })
+  });
   return roleArray;
+}
+
+function addRole() {
+ inquirer.prompt([
+    {
+      type: "list",
+      message: "What is the new role?",
+      name: "role",
+      choices: [
+        "Sales Lead", 
+        "Salesperson",
+        "Lead Engineer",
+        "Software Engineer",
+        "Accountant",
+        "Account Manager",
+        "Legal Team Lead"
+  ],
+    },
+    {
+      type: "input",
+      message: "What is the salary for the new role?",
+      name: "salary",
+    },
+    {
+      type: "list",
+      message: "In what department does this role belong?",
+      name: "dept",
+      choices: [
+        "Sales",
+        "Engineer",
+        "Legal",
+        "Finance"
+      ]
+    },
+  ]);
 }
 
 function viewAllEmployees() {
@@ -98,7 +131,7 @@ function viewAllEmployees() {
 
 function viewAllRoles() {
   connection.query(
-    "SELECT employee.first_name, employee.last_name, role.title AS Title FROM employee JOIN role ON employee.role_id = role.id;",
+    "SELECT role.title, role.id, role.salary FROM role",
     function (err, res) {
       if (err) throw err;
       console.table(res);
@@ -108,12 +141,14 @@ function viewAllRoles() {
 }
 
 function viewAllDepartments() {
-  connection.query("SELECT employee.first_name, employee.last_name, department.name AS Department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id ORDER BY employee.id;", 
-  function (err, res) {
-    if (err) throw err;
-    console.table(res);
-    promptUser();
-  });
+  connection.query(
+    "SELECT * FROM department;",
+    function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      promptUser();
+    }
+  );
 }
 
 function addEmployee() {
@@ -132,25 +167,15 @@ function addEmployee() {
       type: "list",
       message: "What is the Employee's role?",
       name: "role",
-      choices: selectRole()
+      choices: selectRole(),
     },
     {
       type: "list",
       message: "Who is the Employee's manager?",
       name: "manager",
-      choices: selectManager()
-      
+      choices: selectManager(),
     },
-  ])};
-
-
-function addRolePrompt() {
-  inquirer.prompt([
-    {
-      type: "input",
-      message: "What is the new role?",
-      name: "name",
-    },
-    viewAllRoles()
   ]);
 }
+
+function addDepartment() {}
