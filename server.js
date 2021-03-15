@@ -38,10 +38,10 @@ function promptUser() {
     .then(function (val) {
       switch (val.choice) {
         case "View Departments":
-          viewAllDepartments();
+          viewDepartments();
           break;
         case "View All Roles":
-          viewAllRoles();
+          viewRoles();
           break;
         case "View All Employees":
           viewAllEmployees();
@@ -72,51 +72,39 @@ function selectManager() {
   return managerArray;
 }
 
-const roleArray = [];
-function selectRole() {
-  connection.query("SELECT * FROM role", function (err, res) {
-    if (err) throw err;
-    for (var i = 0; i < res.length; i++) {
-      roleArray.push(res[i].title);
-    }
-  });
-  return roleArray;
-}
 
-function addRole() {
- inquirer.prompt([
-    {
-      type: "list",
-      message: "What is the new role?",
-      name: "role",
-      choices: [
-        "Sales Lead", 
-        "Salesperson",
-        "Lead Engineer",
-        "Software Engineer",
-        "Accountant",
-        "Account Manager",
-        "Legal Team Lead"
-  ],
-    },
-    {
-      type: "input",
-      message: "What is the salary for the new role?",
-      name: "salary",
-    },
-    {
-      type: "list",
-      message: "In what department does this role belong?",
-      name: "dept",
-      choices: [
-        "Sales",
-        "Engineer",
-        "Legal",
-        "Finance"
-      ]
-    },
-  ]);
-}
+function addRole() { 
+  connection.query("SELECT role.title AS Title, role.salary AS Salary FROM role",   function(err, res) {
+    inquirer.prompt([
+        {
+          name: "Title",
+          type: "input",
+          message: "What is the roles Title?"
+        },
+        {
+          name: "Salary",
+          type: "input",
+          message: "What is the Salary?"
+
+        } 
+    ]).then(function(res) {
+        connection.query(
+            "INSERT INTO role SET ?",
+            {
+              title: res.Title,
+              salary: res.Salary,
+            },
+            function(err) {
+                if (err) throw err
+                console.table(res);
+                promptUser();
+            }
+        )
+
+    });
+  });
+  }
+
 
 function viewAllEmployees() {
   connection.query(
@@ -129,9 +117,9 @@ function viewAllEmployees() {
   );
 }
 
-function viewAllRoles() {
+function viewRoles() {
   connection.query(
-    "SELECT role.title, role.id, role.salary FROM role",
+    "SELECT role.title, role.id, role.salary FROM role ",
     function (err, res) {
       if (err) throw err;
       console.table(res);
@@ -140,7 +128,7 @@ function viewAllRoles() {
   );
 }
 
-function viewAllDepartments() {
+function viewDepartments() {
   connection.query(
     "SELECT * FROM department;",
     function (err, res) {
@@ -174,8 +162,21 @@ function addEmployee() {
       message: "Who is the Employee's manager?",
       name: "manager",
       choices: selectManager(),
-    },
+    }
   ]);
-}
+  promptUser()
+};
 
-function addDepartment() {}
+
+function selectRole() {
+  var roleArray = [];
+  connection.query("SELECT * FROM role", function(err, res) {
+    if (err) throw err
+    for (var i = 0; i < res.length; i++) {
+      roleArray.push(res[i].title);
+    }
+
+  })
+  return roleArray;
+};
+
