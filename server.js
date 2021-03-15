@@ -1,4 +1,4 @@
-// const mysql = require('mysql');
+
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 const table = require("console.table");
@@ -30,7 +30,6 @@ function promptUser() {
           "Add Department",
           "Add Role",
           "Add Employee",
-          "Update Employee Role",
           "Exit",
         ],
       },
@@ -93,14 +92,14 @@ function addRole() {
       inquirer
         .prompt([
           {
-            name: "title",
             type: "input",
             message: "What is the new role?",
+            name: "title",
           },
           {
-            name: "salary",
             type: "input",
             message: "What is the salary for the new role?",
+            name: "salary",
           },
         ])
         .then(function (res) {
@@ -127,7 +126,7 @@ function addDepartment() {
       {
         type: "input",
         message: "What department would you like to add?",
-        name: "department", 
+        name: "department",
       },
     ])
     .then(function (res) {
@@ -146,14 +145,12 @@ function addDepartment() {
 }
 
 function viewAllEmployees() {
-  connection.query(
-    "SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;",
-    function (err, res) {
-      if (err) throw err;
-      console.table(res);
-      promptUser();
-    }
-  );
+  connection.query("SELECT employee.first_name, employee.last_name, role.title, role.salary, department.name, CONCAT(e.first_name, ' ' ,e.last_name) AS Manager FROM employee INNER JOIN role on role.id = employee.role_id INNER JOIN department on department.id = role.department_id left join employee e on employee.manager_id = e.id;", 
+  function(err, res) {
+    if (err) throw err
+    console.table(res)
+    promptUser()
+})
 }
 
 function viewRoles() {
@@ -180,30 +177,30 @@ function addEmployee() {
     .prompt([
       {
         type: "input",
-        message: "What is the Employee's first name?",
-        name: "first",
+        message: "What is the employee's first name?",
+        name: "firstName",
       },
       {
         type: "input",
-        message: "What is the Employee's last name?",
-        name: "last",
+        message: "What is the employee's last name?",
+        name: "lastName",
       },
       {
         type: "list",
-        message: "What is the Employee's role?",
+        message: "What is the employee's role?",
         name: "role",
         choices: selectRole(),
       },
       {
         type: "list",
-        message: "Who is the Employee's manager?",
+        message: "Who is the employee's manager?",
         name: "manager",
         choices: selectManager(),
       },
     ])
     .then(function (val) {
-      var roleId = selectRole().indexOf(val.role);
-      var managerId = selectManager().indexOf(val.choice);
+      var roleId = selectRole().indexOf(val.role) + 1;
+      var managerId = selectManager().indexOf(val.manager) + 1;
       connection.query(
         "INSERT INTO employee SET ?",
         {
@@ -219,15 +216,4 @@ function addEmployee() {
         }
       );
     });
-}
-
-function selectRole() {
-  var roleArray = [];
-  connection.query("SELECT * FROM role", function (err, res) {
-    if (err) throw err;
-    for (var i = 0; i < res.length; i++) {
-      roleArray.push(res[i].title);
-    }
-  });
-  return roleArray;
 }
